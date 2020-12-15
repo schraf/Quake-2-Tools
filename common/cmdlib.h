@@ -56,10 +56,10 @@ typedef unsigned char byte;
 extern int myargc;
 extern char **myargv;
 
-char *strupr (char *in);
-char *strlower (char *in);
-int Q_strncasecmp (char *s1, char *s2, int n);
-int Q_strcasecmp (char *s1, char *s2);
+char *Q_strupr (char *in);
+char *Q_strlower (char *in);
+int Q_strncasecmp (const char *s1, const char *s2, int n);
+int Q_strcasecmp (const char *s1, const char *s2);
 void Q_getwd (char *out);
 
 int Q_filelength (FILE *f);
@@ -95,9 +95,9 @@ void 	DefaultPath (char *path, char *basepath);
 void 	StripFilename (char *path);
 void 	StripExtension (char *path);
 
-void 	ExtractFilePath (char *path, char *dest);
-void 	ExtractFileBase (char *path, char *dest);
-void	ExtractFileExtension (char *path, char *dest);
+void 	ExtractFilePath (const char *path, char *dest);
+void 	ExtractFileBase (const char *path, char *dest);
+void	ExtractFileExtension (const char *path, char *dest);
 
 int 	ParseNum (char *str);
 

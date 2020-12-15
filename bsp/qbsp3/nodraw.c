@@ -40,6 +40,8 @@ void GLS_BeginScene (void)
 
 void GLS_Winding (winding_t *w, int code)
 {
+	(void)w;
+	(void)code;
 }
 
 void GLS_EndScene (void)

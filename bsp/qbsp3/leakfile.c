@@ -71,6 +71,9 @@ void LeakFile (tree_t *tree)
 		node_t		*nextnode;
 		int			s;
 
+		nextportal = NULL;
+		nextnode = NULL;
+
 		// find the best portal exit
 		next = node->occupied;
 		for (p=node->portals ; p ; p = p->next[!s])
@@ -84,6 +87,10 @@ void LeakFile (tree_t *tree)
 				next = nextnode->occupied;
 			}
 		}
+
+		if (nextportal == NULL)
+			Error("Failed to find best portal exit");
+
 		node = nextnode;
 		WindingCenter (nextportal->winding, mid);
 		fprintf (linefile, "%f %f %f\n", mid[0], mid[1], mid[2]);

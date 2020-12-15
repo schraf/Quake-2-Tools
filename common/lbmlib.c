@@ -763,6 +763,9 @@ void LoadTGA (char *name, byte **pixels, int *width, int *height)
 								red = getc(fin);
 								alphabyte = getc(fin);
 								break;
+						default:
+							Error("unsupported tga depth %d in %s", targa_header.pixel_size, name);
+							return;
 					}
 
 					for(j=0;j<packetSize;j++) {

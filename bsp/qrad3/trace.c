@@ -50,7 +50,7 @@ void MakeTnode (int nodenum)
 	dplane_t		*plane;
 	int				i;
 	dnode_t 		*node;
-	
+
 	t = tnode_p++;
 
 	node = dnodes + nodenum;
@@ -59,7 +59,7 @@ void MakeTnode (int nodenum)
 	t->type = plane->type;
 	VectorCopy (plane->normal, t->normal);
 	t->dist = plane->dist;
-	
+
 	for (i=0 ; i<2 ; i++)
 	{
 		if (node->children[i] < 0)
@@ -70,7 +70,7 @@ void MakeTnode (int nodenum)
 			MakeTnode (node->children[i]);
 		}
 	}
-			
+
 }
 
 
@@ -81,11 +81,11 @@ MakeTnodes
 Loads the node structure out of a .bsp file to be used for light occlusion
 =============
 */
-void MakeTnodes (dmodel_t *bm)
+void MakeTnodes ()
 {
 	// 32 byte align the structs
 	tnodes = malloc( (numnodes+1) * sizeof(tnode_t));
-	tnodes = (tnode_t *)(((int)tnodes + 31)&~31);
+	tnodes = (tnode_t *)(((intptr_t)tnodes + 31)&~31);
 	tnode_p = tnodes;
 
 	MakeTnode (0);
@@ -130,12 +130,12 @@ int TestLine_r (int node, vec3_t start, vec3_t stop)
 
 	if (front >= -ON_EPSILON && back >= -ON_EPSILON)
 		return TestLine_r (tnode->children[0], start, stop);
-	
+
 	if (front < ON_EPSILON && back < ON_EPSILON)
 		return TestLine_r (tnode->children[1], start, stop);
 
 	side = front < 0;
-	
+
 	frac = front / (front-back);
 
 	mid[0] = start[0] + (stop[0] - start[0])*frac;
@@ -186,17 +186,17 @@ qboolean _TestLine (vec3_t start, vec3_t stop)
 	float 			frontx,fronty, frontz, backx, backy, backz;
 	tracestack_t	tracestack[64];
 	tnode_t			*tnode;
-	
+
 	frontx = start[0];
 	fronty = start[1];
 	frontz = start[2];
 	backx = stop[0];
 	backy = stop[1];
 	backz = stop[2];
-	
+
 	tstack_p = tracestack;
 	node = 0;
-	
+
 	while (1)
 	{
 		if (node == CONTENTS_SOLID)
@@ -212,7 +212,7 @@ qboolean _TestLine (vec3_t start, vec3_t stop)
 #endif
 				return false;	// DONE!
 		}
-		
+
 		while (node < 0)
 		{
 		// pop up the stack for a back side
@@ -220,24 +220,24 @@ qboolean _TestLine (vec3_t start, vec3_t stop)
 			if (tstack_p < tracestack)
 				return true;
 			node = tstack_p->node;
-			
+
 		// set the hit point for this plane
-			
+
 			frontx = backx;
 			fronty = backy;
 			frontz = backz;
-			
+
 		// go down the back side
 
 			backx = tstack_p->backpt[0];
 			backy = tstack_p->backpt[1];
 			backz = tstack_p->backpt[2];
-			
+
 			node = tnodes[tstack_p->node].children[!tstack_p->side];
 		}
 
 		tnode = &tnodes[node];
-		
+
 		switch (tnode->type)
 		{
 		case PLANE_X:
@@ -264,7 +264,7 @@ qboolean _TestLine (vec3_t start, vec3_t stop)
 			node = tnode->children[0];
 			continue;
 		}
-		
+
 		if (front < ON_EPSILON && back < ON_EPSILON)
 //		if (front <= 0 && back <= 0)
 		{
@@ -273,23 +273,23 @@ qboolean _TestLine (vec3_t start, vec3_t stop)
 		}
 
 		side = front < 0;
-		
+
 		front = front / (front-back);
-	
+
 		tstack_p->node = node;
 		tstack_p->side = side;
 		tstack_p->backpt[0] = backx;
 		tstack_p->backpt[1] = backy;
 		tstack_p->backpt[2] = backz;
-		
+
 		tstack_p++;
-		
+
 		backx = frontx + front*(backx-frontx);
 		backy = fronty + front*(backy-fronty);
 		backz = frontz + front*(backz-frontz);
-		
-		node = tnode->children[side];		
-	}	
+
+		node = tnode->children[side];
+	}
 }
 
 

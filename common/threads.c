@@ -73,12 +73,13 @@ void ThreadWorkerFunction (int threadnum)
 {
 	int		work;
 
+	(void)threadnum;
+
 	while (1)
 	{
 		work = GetThreadWork ();
 		if (work == -1)
 			break;
-//printf ("thread %i, work %i\n", threadnum, work);
 		workfunction(work);
 	}
 }
@@ -152,7 +153,7 @@ RunThreadsOn
 */
 void RunThreadsOn (int workcnt, qboolean showpacifier, void(*func)(int))
 {
-	int		threadid[MAX_THREADS];
+	DWORD	threadid[MAX_THREADS];
 	HANDLE	threadhandle[MAX_THREADS];
 	int		i;
 	int		start, end;
@@ -181,7 +182,7 @@ void RunThreadsOn (int workcnt, qboolean showpacifier, void(*func)(int))
 			   NULL,	// LPSECURITY_ATTRIBUTES lpsa,
 			   0,		// DWORD cbStack,
 			   (LPTHREAD_START_ROUTINE)func,	// LPTHREAD_START_ROUTINE lpStartAddr,
-			   (LPVOID)i,	// LPVOID lpvThreadParm,
+			   (LPVOID)(intptr_t)i,	// LPVOID lpvThreadParm,
 			   0,			//   DWORD fdwCreate,
 			   &threadid[i]);
 		}

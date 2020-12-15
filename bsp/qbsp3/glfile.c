@@ -129,7 +129,7 @@ void WriteGLView_r (node_t *node, FILE *glview)
 WriteGLView
 =============
 */
-void WriteGLView (tree_t *tree, char *source)
+void WriteGLView (tree_t *tree)
 {
 	char	name[1024];
 	FILE	*glview;

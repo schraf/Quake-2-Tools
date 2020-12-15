@@ -186,9 +186,9 @@ char		gamedir[1024];
 
 void SetQdirFromPath (char *path)
 {
-	char	temp[1024];
-	char	*c;
-	int		len;
+	char		temp[1024];
+	char		*c;
+	size_t		len;
 
 	if (!(path[0] == '/' || path[0] == '\\' || path[1] == ':'))
 	{	// path is partial
@@ -201,7 +201,7 @@ void SetQdirFromPath (char *path)
 
 	len = strlen(BASEDIRNAME);
 	for (c=path+strlen(path)-1 ; c != path ; c--)
-		if (!Q_strncasecmp (c, BASEDIRNAME, len))
+		if (!Q_strncasecmp (c, BASEDIRNAME, (int)len))
 		{
 			strncpy (qdir, path, c+len+1-path);
 			qprintf ("qdir: %s\n", qdir);
@@ -428,7 +428,7 @@ skipwhite:
 }
 
 
-int Q_strncasecmp (char *s1, char *s2, int n)
+int Q_strncasecmp (const char *s1, const char *s2, int n)
 {
 	int		c1, c2;
 
@@ -454,13 +454,13 @@ int Q_strncasecmp (char *s1, char *s2, int n)
 	return 0;		// strings are equal
 }
 
-int Q_strcasecmp (char *s1, char *s2)
+int Q_strcasecmp (const char *s1, const char *s2)
 {
 	return Q_strncasecmp (s1, s2, 99999);
 }
 
 
-char *strupr (char *start)
+char *Q_strupr (char *start)
 {
 	char	*in;
 	in = start;
@@ -472,7 +472,7 @@ char *strupr (char *start)
 	return start;
 }
 
-char *strlower (char *start)
+char *Q_strlower (char *start)
 {
 	char	*in;
 	in = start;
@@ -693,7 +693,7 @@ void DefaultPath (char *path, char *basepath)
 
 void    StripFilename (char *path)
 {
-	int             length;
+	size_t		length;
 
 	length = strlen(path)-1;
 	while (length > 0 && path[length] != PATHSEPERATOR)
@@ -701,9 +701,9 @@ void    StripFilename (char *path)
 	path[length] = 0;
 }
 
-void    StripExtension (char *path)
+void StripExtension (char *path)
 {
-	int             length;
+	size_t		length;
 
 	length = strlen(path)-1;
 	while (length > 0 && path[length] != '.')
@@ -724,9 +724,9 @@ Extract file parts
 */
 // FIXME: should include the slash, otherwise
 // backing to an empty path will be wrong when appending a slash
-void ExtractFilePath (char *path, char *dest)
+void ExtractFilePath (const char *path, char *dest)
 {
-	char    *src;
+	const char    *src;
 
 	src = path + strlen(path) - 1;
 
@@ -740,9 +740,9 @@ void ExtractFilePath (char *path, char *dest)
 	dest[src-path] = 0;
 }
 
-void ExtractFileBase (char *path, char *dest)
+void ExtractFileBase (const char *path, char *dest)
 {
-	char    *src;
+	const char    *src;
 
 	src = path + strlen(path) - 1;
 
@@ -759,9 +759,9 @@ void ExtractFileBase (char *path, char *dest)
 	*dest = 0;
 }
 
-void ExtractFileExtension (char *path, char *dest)
+void ExtractFileExtension (const char *path, char *dest)
 {
-	char    *src;
+	const char    *src;
 
 	src = path + strlen(path) - 1;
 

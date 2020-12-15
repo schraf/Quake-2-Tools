@@ -46,7 +46,7 @@ dplane_t	backplanes[MAX_MAP_PLANES];
 
 char		inbase[32], outbase[32];
 
-int			fakeplanes;					// created planes for origin offset 
+int			fakeplanes;					// created planes for origin offset
 
 int		numbounce = 8;
 qboolean	extrasamples;
@@ -277,7 +277,7 @@ void MakeTransfers (int i)
 	if (patch->numtransfers)
 	{
 		transfer_t	*t;
-		
+
 		if (patch->numtransfers < 0 || patch->numtransfers > MAX_PATCHES)
 			Error ("Weird numtransfers");
 		s = patch->numtransfers * sizeof(transfer_t);
@@ -542,7 +542,7 @@ void RadWorld (void)
 		Error ("Empty map");
 	MakeBackplanes ();
 	MakeParents (0, -1);
-	MakeTnodes (&dmodels[0]);
+	MakeTnodes ();
 
 	// turn each face into a single patch
 	MakePatches ();
@@ -565,7 +565,7 @@ void RadWorld (void)
 
 		// spread light around
 		BounceLight ();
-		
+
 		FreeTransfers ();
 
 		CheckPatches ();
@@ -683,7 +683,7 @@ int main (int argc, char **argv)
 
 	start = I_FloatTime ();
 
-	SetQdirFromPath (argv[i]);	
+	SetQdirFromPath (argv[i]);
 	strcpy (source, ExpandArg(argv[i]));
 	StripExtension (source);
 	DefaultExtension (source, ".bsp");
@@ -711,7 +711,7 @@ int main (int argc, char **argv)
 
 	end = I_FloatTime ();
 	printf ("%5.0f seconds elapsed\n", end-start);
-	
+
 	return 0;
 }
 

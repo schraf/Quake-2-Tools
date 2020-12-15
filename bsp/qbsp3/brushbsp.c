@@ -60,7 +60,7 @@ void FindBrushInTree (node_t *node, int brushnum)
 DrawBrushList
 ================
 */
-void DrawBrushList (bspbrush_t *brush, node_t *node)
+void DrawBrushList (bspbrush_t *brush)
 {
 	int		i;
 	side_t	*s;
@@ -321,7 +321,7 @@ bspbrush_t *AllocBrush (int numsides)
 	bspbrush_t	*bb;
 	int			c;
 
-	c = (int)&(((bspbrush_t *)0)->sides[numsides]);
+	c = (intptr_t)&(((bspbrush_t *)0)->sides[numsides]);
 	bb = malloc(c);
 	memset (bb, 0, c);
 	if (numthreads == 1)
@@ -361,7 +361,7 @@ void FreeBrushList (bspbrush_t *brushes)
 		next = brushes->next;
 
 		FreeBrush (brushes);
-	}		
+	}
 }
 
 /*
@@ -376,8 +376,8 @@ bspbrush_t *CopyBrush (bspbrush_t *brush)
 	bspbrush_t *newbrush;
 	int			size;
 	int			i;
-	
-	size = (int)&(((bspbrush_t *)0)->sides[brush->numsides]);
+
+	size = (intptr_t)&(((bspbrush_t *)0)->sides[brush->numsides]);
 
 	newbrush = AllocBrush (brush->numsides);
 	memcpy (newbrush, brush, size);
@@ -758,6 +758,7 @@ side_t *SelectSplitSide (bspbrush_t *brushes, node_t *node)
 	bestside = NULL;
 	bestvalue = -99999;
 	bestsplits = 0;
+	hintsplit = false;
 
 	// the search order goes: visible-structural, visible-detail,
 	// nonvisible-structural, nonvisible-detail.
@@ -1100,7 +1101,6 @@ void SplitBrush (bspbrush_t *brush, int planenum,
 
 {
 	vec_t	v1;
-	int		i;
 
 	for (i=0 ; i<2 ; i++)
 	{
@@ -1123,7 +1123,7 @@ void SplitBrush (bspbrush_t *brush, int planenum,
 SplitBrushList
 ================
 */
-void SplitBrushList (bspbrush_t *brushes, 
+void SplitBrushList (bspbrush_t *brushes,
 	node_t *node, bspbrush_t **front, bspbrush_t **back)
 {
 	bspbrush_t	*brush, *newbrush, *newbrush2;
@@ -1201,7 +1201,7 @@ node_t *BuildTree_r (node_t *node, bspbrush_t *brushes)
 		c_nodes++;
 
 	if (drawflag)
-		DrawBrushList (brushes, node);
+		DrawBrushList (brushes);
 
 	// find the best plane to use as a splitter
 	bestside = SelectSplitSide (brushes, node);

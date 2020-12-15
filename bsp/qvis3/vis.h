@@ -56,7 +56,7 @@ typedef struct
 {
 	plane_t		plane;	// normal pointing into neighbor
 	int			leaf;	// neighbor
-	
+
 	vec3_t		origin;	// for fast clip testing
 	float		radius;
 
@@ -91,7 +91,7 @@ typedef struct leaf_s
 	portal_t	*portals[MAX_PORTALS_ON_LEAF];
 } leaf_t;
 
-	
+
 typedef struct pstack_s
 {
 	byte		mightsee[MAX_PORTALS/8];		// bit string
@@ -130,8 +130,6 @@ extern	int			c_chains;
 extern	byte	*vismap, *vismap_p, *vismap_end;	// past visfile
 
 extern	int			testlevel;
-
-extern	byte		*uncompressed;
 
 extern	int		leafbytes, leaflongs;
 extern	int		portalbytes, portallongs;

@@ -294,7 +294,7 @@ void FillOutside (node_t *headnode);
 void FloodAreas (tree_t *tree);
 void MarkVisibleSides (tree_t *tree, int start, int end);
 void FreePortal (portal_t *p);
-void EmitAreaPortals (node_t *headnode);
+void EmitAreaPortals ();
 
 void MakeTreePortals (tree_t *tree);
 
@@ -303,7 +303,7 @@ void MakeTreePortals (tree_t *tree);
 // glfile.c
 
 void OutputWinding (winding_t *w, FILE *glview);
-void WriteGLView (tree_t *tree, char *source);
+void WriteGLView (tree_t *tree);
 
 //=============================================================================
 

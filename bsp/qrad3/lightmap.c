@@ -231,6 +231,8 @@ void TriEdge_r (triangulation_t *trian, triedge_t *e)
 	p0 = trian->points[e->p0]->origin;
 	p1 = trian->points[e->p1]->origin;
 	best = 1.1;
+	bestp = 0;
+
 	for (i=0 ; i< trian->numpoints ; i++)
 	{
 		p = trian->points[i]->origin;
@@ -280,8 +282,11 @@ void TriangulatePoints (triangulation_t *trian)
 	if (trian->numpoints < 2)
 		return;
 
-	// find the two closest points
 	bestd = 9999;
+	bp1 = 0;
+	bp2 = 0;
+
+	// find the two closest points
 	for (i=0 ; i<trian->numpoints ; i++)
 	{
 		p1 = trian->points[i]->origin;
@@ -411,7 +416,7 @@ void SampleTriangulation (vec3_t point, triangulation_t *trian, vec3_t color)
 		LerpTriangle (trian, t, point, color);
 		return;
 	}
-	
+
 	// search for exterior edge
 	for (e=trian->edges, j=0 ; j< trian->numedges ; e++, j++)
 	{
@@ -424,7 +429,7 @@ void SampleTriangulation (vec3_t point, triangulation_t *trian, vec3_t color)
 
 		p0 = trian->points[e->p0];
 		p1 = trian->points[e->p1];
-	
+
 		VectorSubtract (p1->origin, p0->origin, v1);
 		VectorNormalize (v1, v1);
 		VectorSubtract (point, p0->origin, v2);
@@ -485,7 +490,7 @@ typedef struct
 	vec3_t	textoworld[2];	// world = texorg + s * textoworld[0]
 
 	vec_t	exactmins[2], exactmaxs[2];
-	
+
 	int		texmins[2], texsize[2];
 	int		surfnum;
 	dface_t	*face;
@@ -515,7 +520,7 @@ void CalcFaceExtents (lightinfo_t *l)
 	maxs[0] = maxs[1] = -99999;
 
 	tex = &texinfo[s->texinfo];
-	
+
 	for (i=0 ; i<s->numedges ; i++)
 	{
 		e = dsurfedges[s->firstedge+i];
@@ -523,7 +528,7 @@ void CalcFaceExtents (lightinfo_t *l)
 			v = dvertexes + dedges[e].v[0];
 		else
 			v = dvertexes + dedges[-e].v[1];
-		
+
 //		VectorAdd (v->point, l->modelorg, vt);
 		VectorCopy (v->point, vt);
 
@@ -538,10 +543,10 @@ void CalcFaceExtents (lightinfo_t *l)
 	}
 
 	for (i=0 ; i<2 ; i++)
-	{	
+	{
 		l->exactmins[i] = mins[i];
 		l->exactmaxs[i] = maxs[i];
-		
+
 		mins[i] = floor(mins[i]/16);
 		maxs[i] = ceil(maxs[i]/16);
 
@@ -569,7 +574,7 @@ void CalcFaceVectors (lightinfo_t *l)
 	int			w, h;
 
 	tex = &texinfo[l->face->texinfo];
-	
+
 // convert from float to double
 	for (i=0 ; i<2 ; i++)
 		for (j=0 ; j<3 ; j++)
@@ -596,7 +601,7 @@ void CalcFaceVectors (lightinfo_t *l)
 	{
 		distscale = -distscale;
 		VectorSubtract (vec3_origin, texnormal, texnormal);
-	}	
+	}
 
 // distscale is the ratio of the distance along the texture normal to
 // the distance along the plane normal
@@ -722,7 +727,7 @@ void CalcPoints (lightinfo_t *l, float sofs, float tofs)
 			}
 		}
 	}
-	
+
 }
 
 
@@ -849,7 +854,7 @@ void CreateDirectLights (void)
 		if (!intensity)
 			intensity = 300;
 		_color = ValueForKey (e, "_color");
-		if (_color && _color[1])
+		if (_color[0])
 		{
 			sscanf (_color, "%f %f %f", &dl->color[0],&dl->color[1],&dl->color[2]);
 			ColorNormalize (dl->color, dl->color);
@@ -915,7 +920,7 @@ Lightscale is the normalizer for multisampling
 =============
 */
 void GatherSampleLight (vec3_t pos, vec3_t normal,
-			float **styletable, int offset, int mapsize, float lightscale)
+			float **styletable, int offset, int mapsize, float samplemod)
 {
 	int				i;
 	directlight_t	*l;
@@ -942,6 +947,8 @@ void GatherSampleLight (vec3_t pos, vec3_t normal,
 			VectorSubtract (l->origin, pos, delta);
 			dist = VectorNormalize (delta, delta);
 			dot = DotProduct (delta, normal);
+			scale = 0.0f;
+
 			if (dot <= 0.001)
 				continue;	// behind sample surface
 
@@ -983,9 +990,9 @@ void GatherSampleLight (vec3_t pos, vec3_t normal,
 				memset (styletable[l->style], 0, mapsize);
 			}
 
-			dest = styletable[l->style] + offset;			
+			dest = styletable[l->style] + offset;
 			// add some light to it
-			VectorMA (dest, scale*lightscale, l->color, dest);
+			VectorMA (dest, scale*samplemod, l->color, dest);
 
 skipadd: ;
 		}
@@ -1043,7 +1050,7 @@ nextpatch:;
 BuildFacelights
 =============
 */
-float	sampleofs[5][2] = 
+float	sampleofs[5][2] =
 {  {0,0}, {-0.25, -0.25}, {0.25, -0.25}, {0.25, 0.25}, {-0.25, 0.25} };
 
 
@@ -1058,7 +1065,7 @@ void BuildFacelights (int facenum)
 	int			numsamples;
 	int			tablesize;
 	facelight_t		*fl;
-	
+
 	f = &dfaces[facenum];
 
 	if ( texinfo[f->texinfo].flags & (SURF_WARP|SURF_SKY) )
@@ -1177,6 +1184,7 @@ void FinalLightFace (int facenum)
 
 	f = &dfaces[facenum];
 	fl = &facelight[facenum];
+	trian = NULL;
 
 	if ( texinfo[f->texinfo].flags & (SURF_WARP|SURF_SKY) )
 		return;		// non-lit texture
@@ -1243,7 +1251,7 @@ dlightdata[lightdatasize-(i+1)*3 + 1] = 255;
 			memset (trian->edgematrix[i], 0, trian->numpoints*sizeof(trian->edgematrix[0][0]) );
 		TriangulatePoints (trian);
 	}
-	
+
 	//
 	// sample the triangulation
 	//
@@ -1279,9 +1287,9 @@ dlightdata[lightdatasize-(i+1)*3 + 1] = 255;
 				VectorAdd (lb, add, lb);
 			}
 			// add an ambient term if desired
-			lb[0] += ambient; 
-			lb[1] += ambient; 
-			lb[2] += ambient; 
+			lb[0] += ambient;
+			lb[1] += ambient;
+			lb[2] += ambient;
 
 			VectorScale (lb, lightscale, lb);
 

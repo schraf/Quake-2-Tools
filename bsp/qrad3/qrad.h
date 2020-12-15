@@ -143,7 +143,7 @@ dleaf_t		*PointInLeaf (vec3_t point);
 
 
 extern	dplane_t	backplanes[MAX_MAP_PLANES];
-extern	int			fakeplanes;					// created planes for origin offset 
+extern	int			fakeplanes;					// created planes for origin offset
 
 extern	float	subdiv;
 
@@ -151,7 +151,7 @@ extern	float	direct_scale;
 extern	float	entity_scale;
 
 int	PointInLeafnum (vec3_t point);
-void MakeTnodes (dmodel_t *bm);
+void MakeTnodes ();
 void MakePatches (void);
 void SubdividePatches (void);
 void PairEdges (void);
